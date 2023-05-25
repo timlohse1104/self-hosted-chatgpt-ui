@@ -1,22 +1,22 @@
 <script lang="ts">
   // import { fetchEventSource } from '@microsoft/fetch-event-source'
 
-  import { apiKeyStorage, chatsStorage, addMessage, clearMessages } from './Storage.svelte'
+  import Messages from './Messages.svelte';
+  import Prompts from './Prompts.svelte';
+  import { addMessage, apiKeyStorage, chatsStorage, clearMessages } from './Storage.svelte';
   import {
+    supportedModels,
+    type Chat,
+    type Message,
     type Request,
     type Response,
-    type Message,
-    type Settings,
     type ResponseModels,
-    type SettingsSelect,
-    type Chat,
-    supportedModels
-  } from './Types.svelte'
-  import Prompts from './Prompts.svelte'
-  import Messages from './Messages.svelte'
+    type Settings,
+    type SettingsSelect
+  } from './Types.svelte';
 
-  import { afterUpdate, onMount } from 'svelte'
-  import { replace } from 'svelte-spa-router'
+  import { afterUpdate, onMount } from 'svelte';
+  import { replace } from 'svelte-spa-router';
 
   // This makes it possible to override the OpenAI API base URL in the .env file
   const apiBase = import.meta.env.VITE_API_BASE || 'https://api.openai.com'
@@ -111,6 +111,14 @@
   ]
 
   $: chat = $chatsStorage.find((chat) => chat.id === chatId) as Chat
+
+  const promptRoles = [
+    'user',
+    'system'
+  ]
+
+  let selectedPromptRole
+
 
   onMount(async () => {
     // Pre-select the last used model
@@ -237,7 +245,7 @@
     */
   
     // Compose the input message
-    const inputMessage: Message = { role: 'user', content: input.value }
+    const inputMessage: Message = { role: selectedPromptRole, content: input.value }
     addMessage(chatId, inputMessage)
 
     // Clear the input value
@@ -400,6 +408,15 @@
 {/if}
 
 <form class="field has-addons has-addons-right is-align-items-flex-end" on:submit|preventDefault={() => submitForm()}>
+  <div class="select">
+    <select bind:value={selectedPromptRole}>
+      {#each promptRoles as promptRole}
+        <option value={promptRole}>
+          {promptRole}
+        </option>
+      {/each}
+    </select>
+  </div>
   <p class="control is-expanded">
     <textarea
       class="input is-info is-focused chat-input"

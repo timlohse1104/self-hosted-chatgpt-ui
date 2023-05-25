@@ -52,7 +52,7 @@ a.is-disabled {
 }
 
 /* Swap the border on user messages to the other side */
-.user-message>.message-body {
+.user-message > .message-body {
   border-width: 0 4px 0 0 !important;
 }
 
@@ -91,13 +91,16 @@ $modal-content-width: 1000px;
   }
 
   100% {
-    background-color: initial
-      /* Default color */
+    background-color: initial;
+    /* Default color */
   }
 }
 
 /* Support for dark mode */
-$modal-background-background-color-dark: rgba($dark, 0.86) !default; // remove this once a new version of bulma-prefers-dark is released
+$modal-background-background-color-dark: rgba(
+  $dark,
+  0.86
+) !default; // remove this once a new version of bulma-prefers-dark is released
 @import "/node_modules/bulma-prefers-dark/build/bulma-prefers-dark.sass";
 
 .modal-card-body {
@@ -106,7 +109,7 @@ $modal-background-background-color-dark: rgba($dark, 0.86) !default; // remove t
 }
 
 /* Support for copy code button */
-.code-block>button {
+.code-block > button {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
