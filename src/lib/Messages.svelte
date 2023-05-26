@@ -1,7 +1,7 @@
 <script lang="ts">
-    import Code from './Code.svelte'
-    import SvelteMarkdown from 'svelte-markdown'
-    import type { Message, Model, Usage } from './Types.svelte'
+    import SvelteMarkdown from 'svelte-markdown';
+    import Code from './Code.svelte';
+    import type { Message, Model, Usage } from './Types.svelte';
 
     // Marked options
     const markedownOptions = {
@@ -52,12 +52,12 @@
         <SvelteMarkdown source={message.content} options={markedownOptions} renderers={{ code: Code, html: Code }}/>
       </div>
     </article>
-  {:else if message.role === 'system'}
+  <!-- {:else if message.role === 'system'}
     <article class="message is-warning user-message">
       <div class="message-body content">
         <SvelteMarkdown source={message.content} options={markedownOptions} renderers={{ code: Code, html: Code }}/>
       </div>
-    </article>
+    </article> -->
   {:else if message.role === 'error'}
     <article class="message is-danger assistant-message">
       <div class="message-body content">

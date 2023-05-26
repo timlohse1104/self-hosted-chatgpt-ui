@@ -72,7 +72,7 @@ $footer-padding: 3rem 1.5rem;
 $fullhd: 2000px;
 $modal-content-width: 1000px;
 
-@import "/node_modules/bulma/bulma.sass";
+@import '/node_modules/bulma/bulma.sass';
 
 /* Pulsing effect - background goes to red color and back */
 .is-pulse {
@@ -97,11 +97,8 @@ $modal-content-width: 1000px;
 }
 
 /* Support for dark mode */
-$modal-background-background-color-dark: rgba(
-  $dark,
-  0.86
-) !default; // remove this once a new version of bulma-prefers-dark is released
-@import "/node_modules/bulma-prefers-dark/build/bulma-prefers-dark.sass";
+$modal-background-background-color-dark: rgba($dark, 0.86) !default; // remove this once a new version of bulma-prefers-dark is released
+@import '/node_modules/bulma-prefers-dark/build/bulma-prefers-dark.sass';
 
 .modal-card-body {
   // remove this once https: //github.com/jloh/bulma-prefers-dark/pull/90 is merged and released

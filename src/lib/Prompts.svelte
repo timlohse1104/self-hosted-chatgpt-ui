@@ -1,5 +1,5 @@
 <script lang="ts">
-  import prompts from '../awesome-chatgpt-prompts/prompts.csv'
+  import prompts from '../awesome-chatgpt-prompts/prompts.csv';
 
   const inputPrompt = (prompt: string) => {
     input.value = prompt

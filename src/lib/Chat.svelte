@@ -25,6 +25,7 @@
   const chatId: number = parseInt(params.chatId)
   
   let updating: boolean = false
+  let systemInput: HTMLTextAreaElement
   let input: HTMLTextAreaElement
   let settings: HTMLDivElement
   let chatNameSettings: HTMLFormElement
@@ -112,19 +113,15 @@
 
   $: chat = $chatsStorage.find((chat) => chat.id === chatId) as Chat
 
-  const promptRoles = [
-    'user',
-    'system'
-  ]
-
-  let selectedPromptRole
-
+  let systemPrompt: string = ''
 
   onMount(async () => {
     // Pre-select the last used model
     if (chat.messages.length > 0) {
       modelSetting.default = chat.messages[chat.messages.length - 1].model || modelSetting.default
       settingsMap = settingsMap
+      const lastSystemPrompt = chat.messages.reverse().find(message => message.role === 'system')
+      systemPrompt = lastSystemPrompt?.content || ''
     }
 
     // Focus the input on mount
@@ -162,7 +159,6 @@
   afterUpdate(() => {
     // Scroll to the bottom of the page after any updates to the messages array
     document.querySelector('#content')?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-    input.focus()
   })
 
 
@@ -236,16 +232,12 @@
 
 
   const submitForm = async (recorded: boolean = false): Promise<void> => {
-    // Compose the system prompt message if there are no messages yet - disabled for now
-    /*
-    if (chat.messages.length === 0) {
-      const systemPrompt: Message = { role: 'system', content: 'You are a helpful assistant.' }
-      addMessage(chatId, systemPrompt)
-    }
-    */
+    // Compose the system prompt message and choose latest system prompt if chat messages are available
+    const systemPromptMessage: Message = { role: 'system', content: systemPrompt }
+    addMessage(chatId, systemPromptMessage)
   
     // Compose the input message
-    const inputMessage: Message = { role: selectedPromptRole, content: input.value }
+    const inputMessage: Message = { role: 'user', content: input.value }
     addMessage(chatId, inputMessage)
 
     // Clear the input value
@@ -407,48 +399,59 @@
   <Prompts bind:input />
 {/if}
 
-<form class="field has-addons has-addons-right is-align-items-flex-end" on:submit|preventDefault={() => submitForm()}>
-  <div class="select">
-    <select bind:value={selectedPromptRole}>
-      {#each promptRoles as promptRole}
-        <option value={promptRole}>
-          {promptRole}
-        </option>
-      {/each}
-    </select>
+
+  <div class="box">
+    <p class="label">Chat configuration</p>
+    <p class="control is-expanded subtitle">
+      <textarea
+        class="input is-info chat-input"
+        placeholder="Choose your chat configuration..."
+        rows="1"
+        on:input={(e) => {
+          // Resize the textarea to fit the content - auto is important to reset the height after deleting content
+          systemInput.style.height = 'auto'
+          systemInput.style.height = systemInput.scrollHeight + 'px'
+        }}
+        bind:this={systemInput}
+        bind:value={systemPrompt}
+      />
+      <p class="label">Chat Input</p>
+      <form class="field has-addons has-addons-right is-align-items-flex-end" on:submit|preventDefault={() => submitForm()}>    
+        <p class="control is-expanded">
+          <textarea
+            class="input is-info chat-input"
+            placeholder="Type your message here..."
+            rows="1"
+            on:keydown={(e) => {
+              // Only send if Enter is pressed, not Shift+Enter
+              if (e.key === 'Enter' && !e.shiftKey) {
+                submitForm()
+                e.preventDefault()
+              }
+            }}
+            on:input={(e) => {
+              // Resize the textarea to fit the content - auto is important to reset the height after deleting content
+              input.style.height = 'auto'
+              input.style.height = input.scrollHeight + 'px'
+            }}
+            bind:this={input}
+          />
+      
+      <p class="control" class:is-hidden={!recognition}>
+        <button class="button" class:is-pulse={recording} on:click|preventDefault={recordToggle}
+          ><span class="greyscale">🎤</span></button
+        >
+      </p>
+      <p class="control">
+        <button class="button" on:click|preventDefault={showSettings}><span class="greyscale">⚙️</span></button>
+      </p>
+      <p class="control">
+        <button class="button is-info" type="submit">Send</button>
+      </p>
+    </form>
   </div>
-  <p class="control is-expanded">
-    <textarea
-      class="input is-info is-focused chat-input"
-      placeholder="Type your message here..."
-      rows="1"
-      on:keydown={(e) => {
-        // Only send if Enter is pressed, not Shift+Enter
-        if (e.key === 'Enter' && !e.shiftKey) {
-          submitForm()
-          e.preventDefault()
-        }
-      }}
-      on:input={(e) => {
-        // Resize the textarea to fit the content - auto is important to reset the height after deleting content
-        input.style.height = 'auto'
-        input.style.height = input.scrollHeight + 'px'
-      }}
-      bind:this={input}
-    />
-  </p>
-  <p class="control" class:is-hidden={!recognition}>
-    <button class="button" class:is-pulse={recording} on:click|preventDefault={recordToggle}
-      ><span class="greyscale">🎤</span></button
-    >
-  </p>
-  <p class="control">
-    <button class="button" on:click|preventDefault={showSettings}><span class="greyscale">⚙️</span></button>
-  </p>
-  <p class="control">
-    <button class="button is-info" type="submit">Send</button>
-  </p>
-</form>
+
+
 
 <svelte:window
   on:keydown={(event) => {
