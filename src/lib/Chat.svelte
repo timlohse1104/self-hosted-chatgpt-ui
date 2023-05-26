@@ -120,7 +120,12 @@
     if (chat.messages.length > 0) {
       modelSetting.default = chat.messages[chat.messages.length - 1].model || modelSetting.default
       settingsMap = settingsMap
-      const lastSystemPrompt = chat.messages.reverse().find(message => message.role === 'system')
+      const lastSystemPrompt = chat.messages.reduceRight((acc, message) => {
+        if (!acc && message.role === 'system') {
+          return message
+        }
+        return acc
+      }, null)
       systemPrompt = lastSystemPrompt?.content || ''
     }
 
