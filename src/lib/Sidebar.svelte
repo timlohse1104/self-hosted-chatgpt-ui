@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { params, replace } from 'svelte-spa-router'
+  import { params, replace } from 'svelte-spa-router';
 
-  import { apiKeyStorage, chatsStorage, clearChats, deleteChat } from './Storage.svelte'
-  import { exportAsMarkdown } from './Export.svelte'
+  import { exportAsMarkdown } from './Export.svelte';
+  import { apiKeyStorage, chatsStorage, clearChats, deleteChat } from './Storage.svelte';
 
   $: sortedChats = $chatsStorage.sort((a, b) => b.id - a.id)
 
@@ -52,13 +52,13 @@
   <p class="menu-label">Actions</p>
   <ul class="menu-list">
     <li>
-      <a href={'#/'} class="panel-block" class:is-disabled={!$apiKeyStorage} class:is-active={!activeChatId}
-        ><span class="greyscale mr-2">🔑</span> API key</a
+      <a href={'#/chat/new'} class="panel-block" class:is-disabled={!$apiKeyStorage}
+        ><span class="greyscale mr-2">➕</span> New chat</a
       >
     </li>
     <li>
-      <a href={'#/chat/new'} class="panel-block" class:is-disabled={!$apiKeyStorage}
-        ><span class="greyscale mr-2">➕</span> New chat</a
+      <a href={'#/'} class="panel-block" class:is-disabled={!$apiKeyStorage} class:is-active={!activeChatId}
+        ><span class="greyscale mr-2">🔑</span> API key</a
       >
     </li>
     <li>
