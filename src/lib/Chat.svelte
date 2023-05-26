@@ -112,6 +112,7 @@
   ]
 
   $: chat = $chatsStorage.find((chat) => chat.id === chatId) as Chat
+  $: sendButtonLabel = (chat.messages.length > 0 && !input?.value) ? 'Retry last' : 'Send'
 
   let systemPrompt: string = ''
 
@@ -242,7 +243,13 @@
     addMessage(chatId, systemPromptMessage)
   
     // Compose the input message
-    const inputMessage: Message = { role: 'user', content: input.value }
+    const lastNonSystemMessage = chat.messages.reduceRight((acc, message) => {
+      if (!acc && message.role === 'user') {
+        return message.content
+      }
+      return acc
+    }, '')
+    const inputMessage: Message = { role: 'user', content: input.value || lastNonSystemMessage }
     addMessage(chatId, inputMessage)
 
     // Clear the input value
@@ -451,12 +458,10 @@
         <button class="button" on:click|preventDefault={showSettings}><span class="greyscale">⚙️</span></button>
       </p>
       <p class="control">
-        <button class="button is-info" type="submit">Send</button>
+        <button class="button is-info" type="submit">{sendButtonLabel}</button>
       </p>
     </form>
   </div>
-
-
 
 <svelte:window
   on:keydown={(event) => {
