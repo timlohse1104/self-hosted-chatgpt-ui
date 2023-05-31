@@ -17,6 +17,7 @@
 
   import { afterUpdate, onMount } from 'svelte';
   import { replace } from 'svelte-spa-router';
+  import { systemPrompts } from "./system-prompts";
 
   // This makes it possible to override the OpenAI API base URL in the .env file
   const apiBase = import.meta.env.VITE_API_BASE || 'https://api.openai.com'
@@ -31,6 +32,7 @@
   let chatNameSettings: HTMLFormElement
   let recognition: any = null
   let recording = false
+  let dropdownIsActive = false
 
   const modelSetting: Settings & SettingsSelect = {
     key: 'model',
@@ -415,7 +417,8 @@
   <div class="box">
     <p class="label">Chat configuration</p>
     <p class="control is-expanded subtitle">
-      <textarea
+      <div class="field has-addons has-addons-right is-align-items-flex-end">
+        <textarea
         class="input is-info chat-input"
         placeholder="Choose your chat configuration..."
         rows="1"
@@ -426,7 +429,30 @@
         }}
         bind:this={systemInput}
         bind:value={systemPrompt}
-      />
+        />
+      
+        <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+              <span>Examples</span>
+              <span class="icon is-small">
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+              </span>
+            </button>
+          </div>
+          <div class="dropdown-menu" id="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+              {#each systemPrompts as prompt}
+                <a class="dropdown-item" href={'#'} on:click|preventDefault={() => systemPrompt = prompt.message}>
+                  {prompt.name}
+                </a>
+              {/each}
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       <p class="label">Chat Input</p>
       <form class="field has-addons has-addons-right is-align-items-flex-end" on:submit|preventDefault={() => submitForm()}>    
         <p class="control is-expanded">
