@@ -3,7 +3,7 @@
 
   import Messages from './Messages.svelte';
   import Prompts from './Prompts.svelte';
-  import { addMessage, apiKeyStorage, chatsStorage, clearMessages } from './Storage.svelte';
+  import { addMessage, apiKeyStorage, chatsStorage, clearMessages, deleteMessage } from './Storage.svelte';
   import {
     supportedModels,
     type Chat,
@@ -282,11 +282,13 @@
           const utterance = new SpeechSynthesisUtterance(choice.message.content)
           window.speechSynthesis.speak(utterance)
         }
+        // Update chat name
+        setChatName()
       })
     }
   }
 
-  const suggestName = async (): Promise<void> => {
+  const setChatName = async (): Promise<void> => {
     const suggestMessage: Message = {
       role: 'user',
       content: "Can you give me a 5 word summary of this conversation's topic?"
@@ -295,19 +297,26 @@
 
     const response = await sendRequest(chat.messages)
 
-    if (response.error) {
-      addMessage(chatId, {
-        role: 'error',
-        content: `Error: ${response.error.message}`
-      })
-    } else {
-      response.choices.forEach((choice) => {
+    response.choices.forEach((choice) => {
         choice.message.usage = response.usage
-        addMessage(chatId, choice.message)
+        deleteMessage(chatId, -1)
         chat.name = choice.message.content
         chatsStorage.set($chatsStorage)
       })
-    }
+
+    // if (response.error) {
+    //   addMessage(chatId, {
+    //     role: 'error',
+    //     content: `Error: ${response.error.message}`
+    //   })
+    // } else {
+    //   response.choices.forEach((choice) => {
+    //     choice.message.usage = response.usage
+    //     addMessage(chatId, choice.message)
+    //     chat.name = choice.message.content
+    //     chatsStorage.set($chatsStorage)
+    //   })
+    // }
   }
 
   const deleteChat = () => {
@@ -393,7 +402,7 @@
       <p class="subtitle is-5">
         {chat.name || `Chat ${chat.id}`}
         <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Rename chat" on:click|preventDefault={showChatNameSettings}>✏️</a>
-        <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Suggest a chat name" on:click|preventDefault={suggestName}>💡</a>
+        <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Generate new chat name" on:click|preventDefault={setChatName}>💡</a>
         <a href={'#'} class="greyscale ml-2 is-hidden has-text-weight-bold editbutton" title="Delete this chat" on:click|preventDefault={deleteChat}>🗑️</a>
       </p>
     </div>
@@ -437,7 +446,6 @@
           bind:this={systemInput}
           bind:value={systemPrompt}
         />
-      
         <div class="dropdown is-hoverable">
           <div class="dropdown-trigger">
             <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
@@ -462,7 +470,6 @@
           </div>
         </div>
       </div>
-
 
       <p class="label">Chat Input</p>
       <form class="field has-addons has-addons-right is-align-items-flex-end" on:submit|preventDefault={() => submitForm()}>    

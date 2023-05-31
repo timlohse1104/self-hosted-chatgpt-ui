@@ -52,4 +52,11 @@
     const chats = get(chatsStorage)
     chatsStorage.set(chats.filter((chat) => chat.id !== chatId))
   }
+
+  export const deleteMessage = (chatId: number, index: number) => {
+    const chats = get(chatsStorage)
+    const chat = chats.find((chat) => chat.id === chatId) as Chat
+    chat.messages.splice(index, 1)
+    chatsStorage.set(chats)
+  }
 </script>
