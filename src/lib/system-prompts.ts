@@ -3,4 +3,9 @@ export const systemPrompts = [
     {name: "Explain Simply", message: "As if I were a twelve-year-old, explain how a computer works."},
     {name: "Pessimistic Person", message: "Answer as a very pessimistic person."},
     {name: "Optimistic Person", message: "Answer as a very optimistic person."},
+    // https://github.com/mustvlad/ChatGPT-System-Prompts
+    {name:"Translation -> EN", message: "Translate every question / message of the user into English"},
+    {name:"Translation -> DE", message: "Translate every question / message of the user into English"},
+    {name:"Translation -> FR", message: "Translate every question / message of the user into English"},
+    {name:"Translation -> PT", message: "Translate every question / message of the user into English"},
 ]

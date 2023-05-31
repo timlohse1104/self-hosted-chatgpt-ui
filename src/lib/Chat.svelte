@@ -419,16 +419,16 @@
     <p class="control is-expanded subtitle">
       <div class="field has-addons has-addons-right is-align-items-flex-end">
         <textarea
-        class="input is-info chat-input"
-        placeholder="Choose your chat configuration..."
-        rows="1"
-        on:input={(e) => {
-          // Resize the textarea to fit the content - auto is important to reset the height after deleting content
-          systemInput.style.height = 'auto'
-          systemInput.style.height = systemInput.scrollHeight + 'px'
-        }}
-        bind:this={systemInput}
-        bind:value={systemPrompt}
+          class="input is-info chat-input"
+          placeholder="Choose your chat configuration..."
+          rows="1"
+          on:input={(e) => {
+            // Resize the textarea to fit the content - auto is important to reset the height after deleting content
+            systemInput.style.height = 'auto'
+            systemInput.style.height = systemInput.scrollHeight + 'px'
+          }}
+          bind:this={systemInput}
+          bind:value={systemPrompt}
         />
       
         <div class="dropdown is-hoverable">
@@ -442,8 +442,22 @@
           </div>
           <div class="dropdown-menu" id="dropdown-menu" role="menu">
             <div class="dropdown-content">
+              <a class="dropdown-item" href={'#'} on:click|preventDefault={() => {
+                systemPrompt = "";
+                systemInput.value = systemPrompt;
+                const inputEvent = new Event('input', { bubbles: true });
+                systemInput.dispatchEvent(inputEvent);
+              }}>
+                Clear
+              </a>
+              <hr class="dropdown-divider">
               {#each systemPrompts as prompt}
-                <a class="dropdown-item" href={'#'} on:click|preventDefault={() => systemPrompt = prompt.message}>
+                <a class="dropdown-item" href={'#'} on:click|preventDefault={() => {
+                  systemPrompt = prompt.message;
+                  systemInput.value = systemPrompt;
+                  const inputEvent = new Event('input', { bubbles: true });
+                  systemInput.dispatchEvent(inputEvent);
+                }}>
                   {prompt.name}
                 </a>
               {/each}
