@@ -378,6 +378,13 @@
       recognition?.start()
     }
   }
+
+  const updateSelectedSystemPrompt = (prompt) => {
+    systemPrompt = prompt;
+    systemInput.value = systemPrompt;
+    const inputEvent = new Event('input', { bubbles: true });
+    systemInput.dispatchEvent(inputEvent);
+  }
 </script>
 
 <nav class="level chat-header">
@@ -442,22 +449,12 @@
           </div>
           <div class="dropdown-menu" id="dropdown-menu" role="menu">
             <div class="dropdown-content">
-              <a class="dropdown-item" href={'#'} on:click|preventDefault={() => {
-                systemPrompt = "";
-                systemInput.value = systemPrompt;
-                const inputEvent = new Event('input', { bubbles: true });
-                systemInput.dispatchEvent(inputEvent);
-              }}>
+              <a class="dropdown-item" href={'#'} on:click|preventDefault={() => updateSelectedSystemPrompt('')}>
                 Clear
               </a>
               <hr class="dropdown-divider">
               {#each systemPrompts as prompt}
-                <a class="dropdown-item" href={'#'} on:click|preventDefault={() => {
-                  systemPrompt = prompt.message;
-                  systemInput.value = systemPrompt;
-                  const inputEvent = new Event('input', { bubbles: true });
-                  systemInput.dispatchEvent(inputEvent);
-                }}>
+                <a class="dropdown-item" href={'#'} on:click|preventDefault={() => updateSelectedSystemPrompt(prompt.message)}>
                   {prompt.name}
                 </a>
               {/each}
