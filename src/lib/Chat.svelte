@@ -17,7 +17,7 @@
 
   import { afterUpdate, onMount } from 'svelte';
   import { replace } from 'svelte-spa-router';
-  import { systemPrompts } from "./system-prompts";
+  import { systemPrompts } from './system-prompts';
 
   // This makes it possible to override the OpenAI API base URL in the .env file
   const apiBase = import.meta.env.VITE_API_BASE || 'https://api.openai.com'
@@ -32,7 +32,6 @@
   let chatNameSettings: HTMLFormElement
   let recognition: any = null
   let recording = false
-  let dropdownIsActive = false
 
   const modelSetting: Settings & SettingsSelect = {
     key: 'model',
@@ -298,11 +297,11 @@
     const response = await sendRequest(chat.messages)
 
     response.choices.forEach((choice) => {
-        choice.message.usage = response.usage
-        deleteMessage(chatId, -1)
-        chat.name = choice.message.content
-        chatsStorage.set($chatsStorage)
-      })
+      choice.message.usage = response.usage
+      deleteMessage(chatId, -1)
+      chat.name = choice.message.content
+      chatsStorage.set($chatsStorage)
+    })
 
     // if (response.error) {
     //   addMessage(chatId, {
@@ -389,10 +388,14 @@
   }
 
   const updateSelectedSystemPrompt = (prompt) => {
-    systemPrompt = prompt;
-    systemInput.value = systemPrompt;
-    const inputEvent = new Event('input', { bubbles: true });
-    systemInput.dispatchEvent(inputEvent);
+    systemPrompt = prompt
+    systemInput.value = systemPrompt
+    const inputEvent = new Event('input', { bubbles: true })
+    systemInput.dispatchEvent(inputEvent)
+  }
+
+  const handleMessageDeletion = (event) => {
+    deleteMessage(chatId, event.detail)
   }
 </script>
 
@@ -415,7 +418,7 @@
   </div>
 </nav>
 
-<Messages bind:input messages={chat.messages} defaultModel={modelSetting.default} />
+<Messages bind:input messages={chat.messages} defaultModel={modelSetting.default} on:delete={handleMessageDeletion}/>
 
 {#if updating}
   <article class="message is-success assistant-message">

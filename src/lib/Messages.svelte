@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
     import SvelteMarkdown from 'svelte-markdown';
     import Code from './Code.svelte';
     import type { Message, Model, Usage } from './Types.svelte';
@@ -13,6 +14,9 @@
     export let messages : Message[]
     export let input: HTMLTextAreaElement
     export let defaultModel: Model
+    let isDeleteButtonHidden = true
+
+    const dispatch = createEventDispatcher()
 
     // Reference: https://openai.com/pricing#language-models
     const tokenPrice : Record<string, [number, number]> = {
@@ -30,15 +34,26 @@
 
       return 0
     }
+
+    const dispatchDeleteEvent = (message) => dispatch('delete', message)
+    const showDeleteButton = () => {
+      isDeleteButtonHidden = false
+    }
+    const hideDeleteButton = () => {
+      isDeleteButtonHidden = true
+    }
 </script>
 
-{#each messages as message}
+{#each messages as message, i}
   {#if message.role === 'user'}
+    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
     <article
       class="message is-info user-message"
       class:has-text-right={message.content.split('\n').filter((line) => line.trim()).length === 1}
+      on:mouseover={showDeleteButton}
+      on:mouseout={hideDeleteButton}
     >
-      <div class="message-body content">
+      <div class="message-body content" style="position: relative;">
         <a
           href={'#'}
           class="greyscale is-pulled-right ml-2 is-hidden editbutton"
@@ -49,6 +64,7 @@
         >
           ✏️
         </a>
+        <button class="delete is-medium is-danger" class:is-hidden={isDeleteButtonHidden} style="position: absolute; top: 0; right: 0;" on:click={() => dispatchDeleteEvent(i)}></button>
         <SvelteMarkdown source={message.content} options={markedownOptions} renderers={{ code: Code, html: Code }}/>
       </div>
     </article>
@@ -60,14 +76,20 @@
       </div>
     </article> -->
   {:else if message.role === 'error'}
-    <article class="message is-danger assistant-message">
-      <div class="message-body content">
+    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+    <article class="message is-danger assistant-message" on:mouseover={showDeleteButton}
+    on:mouseout={hideDeleteButton}>
+      <div class="message-body content" style="position: relative;">
+        <button class="delete is-medium is-danger" class:is-hidden={isDeleteButtonHidden} style="position: absolute; top: 0; right: 0;" on:click={() => dispatchDeleteEvent(i)}></button>
         <SvelteMarkdown source={message.content} options={markedownOptions} renderers={{ code: Code, html: Code }}/>
       </div>
     </article>
   {:else}
-    <article class="message is-success assistant-message">
-      <div class="message-body content">
+    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+    <article class="message is-success assistant-message" on:mouseover={showDeleteButton}
+    on:mouseout={hideDeleteButton}>
+      <div class="message-body content" style="position: relative;">
+        <button class="delete is-medium is-danger" class:is-hidden={isDeleteButtonHidden} style="position: absolute; top: 0; right: 0;" on:click={() => dispatchDeleteEvent(i)}></button>
         <SvelteMarkdown source={message.content} options={markedownOptions} renderers={{ code: Code, html: Code }}/>
         {#if message.usage}
           <p class="is-size-7">
